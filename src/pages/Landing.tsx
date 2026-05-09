@@ -13,7 +13,7 @@ export function Landing() {
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [scrolled, setScrolled] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-
+  // This is only prototype
   const [prefTheme, setPrefTheme] = useState<'dark' | 'light'>('dark');
   const [prefMotion, setPrefMotion] = useState<'strong' | 'weak'>('strong');
   const settingsRef = useRef<HTMLDivElement>(null);
@@ -375,7 +375,7 @@ export function Landing() {
 
             <div className="flex flex-wrap gap-3">
               <a
-                href="https://github.com/AxelS27/Phylaxify"
+                href="https://github.com/AxelS27/Phylaxify2"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub repository"
