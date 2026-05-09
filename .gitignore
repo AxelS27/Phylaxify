@@ -1,0 +1,13 @@
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+.gemini
+old_phylaxify
+models
+hf-space/models
+hf-space/models_old
+hf-space
+hf-space/__pycache__
+.claude
