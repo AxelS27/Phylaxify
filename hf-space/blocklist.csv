@@ -1,0 +1,122 @@
+# Phylaxify keyword blocklist — hard-rule filter applied BEFORE the BERT model.
+# If the donation message hits any of these, it short-circuits to JUDOL without
+# running the model (faster + zero-doubt for known brands/keywords).
+#
+# Edit this file freely — add new banned brands or phrases as you spot them in
+# production webhooks. After editing, restart / redeploy the HF Space to reload.
+#
+# Format:
+#   - Lines starting with '#' or blank lines are ignored.
+#   - Header row (term,category,match_type,note) is required.
+#   - Matching runs on the AGGRESSIVE-VIEW of the message (lowercased, leetspeak
+#     folded, spaces glued, homoglyphs unmasked), so "𝐒𝐆𝐈𝟖𝟖", "S G I 8 8", and
+#     "5G18" all collapse to "sgi88" before this list is checked.
+#
+# Columns:
+#   term        - the word/phrase to match. Case-insensitive (always lowercase
+#                 it here for clarity).
+#   category    - one of: judol_brand | judol_keyword | pinjol_brand |
+#                 pinjol_keyword | scam | custom. Returned in the API response
+#                 so the dashboard can group hits.
+#   match_type  - substring (default; fastest, catches partial hits like
+#                 "alexis17 mantul")
+#               | exact     (whole-word match only — use for short generic
+#                            words to avoid false positives, e.g. "wd")
+#               | regex     (Python regex; for advanced patterns)
+#   note        - optional free-text reminder. Leave blank if not needed.
+#
+term,category,match_type,note
+#
+# ============================================================
+# Judol brands — slot/casino site names observed in production.
+# ============================================================
+alexis17,judol_brand,substring,
+alexis,judol_brand,substring,parent brand (alexis17/alexis88/etc.)
+sgi88,judol_brand,substring,
+manut88,judol_brand,substring,
+gokong,judol_brand,substring,
+mala,judol_brand,exact,short word — exact-match to avoid false positives
+mala.com,judol_brand,substring,
+abgwin,judol_brand,substring,
+pulauwin,judol_brand,substring,
+pokerbola,judol_brand,substring,
+agustoto,judol_brand,substring,
+mandalika77,judol_brand,substring,
+weton88,judol_brand,substring,
+pluto88,judol_brand,substring,
+dora77,judol_brand,substring,
+dewadora,judol_brand,substring,
+bonanja,judol_brand,substring,
+zeus888,judol_brand,substring,
+zeus88,judol_brand,substring,
+olympus888,judol_brand,substring,
+starlight888,judol_brand,substring,
+gates888,judol_brand,substring,
+aztec88,judol_brand,substring,
+sweet888,judol_brand,substring,
+mahjong88,judol_brand,substring,
+maxwin88,judol_brand,substring,
+hoki88,judol_brand,substring,
+kong88,judol_brand,substring,
+spaceman88,judol_brand,substring,
+princess888,judol_brand,substring,
+bonanza888,judol_brand,substring,
+#
+# ============================================================
+# Judol keywords / slang — strong promotional signals.
+# Use 'exact' for short common words to avoid catching legit text.
+# ============================================================
+gacor,judol_keyword,substring,easy-win slang
+maxwin,judol_keyword,substring,
+jackpot,judol_keyword,substring,
+freespin,judol_keyword,substring,
+freebet,judol_keyword,substring,
+scatter,judol_keyword,substring,
+rungkad,judol_keyword,substring,
+boncos,judol_keyword,substring,
+anti rungkad,judol_keyword,substring,
+anti zonk,judol_keyword,substring,
+auto wd,judol_keyword,substring,
+auto cuan,judol_keyword,substring,
+auto jp,judol_keyword,substring,
+auto sultan,judol_keyword,substring,
+cuan deras,judol_keyword,substring,
+gampang menang,judol_keyword,substring,
+pasti menang,judol_keyword,substring,
+dijamin menang,judol_keyword,substring,
+mantul jiwa,judol_keyword,substring,
+slot gacor,judol_keyword,substring,
+spin gacor,judol_keyword,substring,
+judi online,judol_keyword,substring,
+judi onlen,judol_keyword,substring,
+judol,judol_keyword,substring,
+min depo,judol_keyword,substring,minimum-deposit promo phrasing
+bonus depo,judol_keyword,substring,
+depo pulsa,judol_keyword,substring,
+rtp slot,judol_keyword,substring,
+pola gacor,judol_keyword,substring,
+#
+# ============================================================
+# Pinjol (predatory online-loan) brands & keywords.
+# Add real pinjol app names you want to filter here.
+# ============================================================
+pinjol,pinjol_keyword,substring,
+pinjaman ilegal,pinjol_keyword,substring,
+pinjaman online ilegal,pinjol_keyword,substring,
+dana cair cepat,pinjol_keyword,substring,
+cair tanpa bi checking,pinjol_keyword,substring,
+tanpa jaminan ktp,pinjol_keyword,substring,
+#
+# ============================================================
+# Generic scam / phishing patterns.
+# ============================================================
+klaim hadiah,scam,substring,
+hadiah jutaan,scam,substring,
+klik link,scam,substring,
+klik bio,scam,substring,
+swipe up bio,scam,substring,
+cek bio,scam,substring,
+#
+# ============================================================
+# Your custom entries — add below this line.
+# ============================================================

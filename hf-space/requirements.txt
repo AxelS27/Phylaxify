@@ -1,0 +1,8 @@
+fastapi>=0.115.2
+uvicorn[standard]>=0.30.6
+pydantic>=2.5
+torch
+transformers>=4.40
+safetensors
+# Defense-in-depth for homoglyph obfuscation (UTS#39 confusables data)
+confusable_homoglyphs>=3.3
