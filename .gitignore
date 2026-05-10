@@ -5,4 +5,3 @@ dist-ssr
 *.local
 hf-space/models
 hf-space/models_old
-hf-space/__pycache__
