@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { useAuth } from '../lib/auth';
 import { useProfile, updateProfile } from '../lib/profile';
+import { isActivePremium } from '../lib/plan';
 import { overlayUrl, saweriaWebhookUrl } from '../lib/urls';
 
 type TabType = 'filter' | 'overlay' | 'identity';
@@ -9,6 +11,7 @@ type TabType = 'filter' | 'overlay' | 'identity';
 export function Settings() {
   const { user } = useAuth();
   const { profile, refresh } = useProfile();
+  const isPremium = isActivePremium(profile?.plan ?? 'free', profile?.plan_expires_at ?? null);
 
   const [activeTab, setActiveTab] = useState<TabType>('filter');
   const [username, setUsername] = useState('');
@@ -40,10 +43,14 @@ export function Settings() {
     if (!user || !profile) return;
     const next = !profile.filter_enabled;
     const { error: err } = await updateProfile(user.id, { filter_enabled: next });
-    if (err) {
-      setError(err);
-      return;
-    }
+    if (err) { setError(err); return; }
+    refresh();
+  }
+
+  async function setModelTier(tier: 'svm' | 'dl') {
+    if (!user || !profile || !isPremium) return;
+    const { error: err } = await updateProfile(user.id, { model_tier: tier });
+    if (err) { setError(err); return; }
     refresh();
   }
 
@@ -122,8 +129,55 @@ export function Settings() {
                        </div>
                        <div className="p-5 bg-gold/5 rounded-2xl border border-gold/20">
                           <h4 className="text-[10px] text-gold font-bold uppercase tracking-widest mb-1">Layer 3 (ML)</h4>
-                          <p className="text-xs text-white/60">BERT Neural Protection</p>
+                          <p className="text-xs text-white/60">Neural Protection</p>
                        </div>
+                    </div>
+
+                    {/* ML / DL tier switch */}
+                    <div className="space-y-3 pt-2">
+                      <label className="font-label text-[10px] text-white/40 uppercase tracking-[0.2em]">
+                        Layer 3 — ML Model Tier
+                      </label>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setModelTier('svm')}
+                          disabled={!isPremium}
+                          className={`flex-1 py-3 rounded-xl border text-[10px] uppercase font-bold tracking-widest transition-all ${
+                            (profile?.model_tier ?? 'svm') === 'svm'
+                              ? 'bg-white/10 text-white border-white/20'
+                              : 'border-white/10 text-white/40 hover:bg-white/5'
+                          } disabled:cursor-default`}
+                        >
+                          SVM
+                          <span className="block text-[9px] font-normal normal-case mt-0.5 opacity-60">Standard · Free</span>
+                        </button>
+                        <button
+                          onClick={() => setModelTier('dl')}
+                          disabled={!isPremium}
+                          className={`flex-1 relative py-3 rounded-xl border text-[10px] uppercase font-bold tracking-widest transition-all ${
+                            (profile?.model_tier ?? 'svm') === 'dl'
+                              ? 'bg-gold/10 text-gold border-gold/30'
+                              : isPremium
+                                ? 'border-white/10 text-white/40 hover:bg-white/5'
+                                : 'border-white/5 text-white/20 cursor-not-allowed'
+                          }`}
+                        >
+                          {!isPremium && (
+                            <span className="material-symbols-outlined text-[11px] absolute top-2 right-2 text-white/20">lock</span>
+                          )}
+                          DL
+                          <span className="block text-[9px] font-normal normal-case mt-0.5 opacity-60">Deep Learning · Premium</span>
+                        </button>
+                      </div>
+                      {!isPremium ? (
+                        <p className="text-[10px] text-white/30 uppercase tracking-widest">
+                          <Link to="/upgrade" className="text-gold hover:underline">Upgrade to Premium</Link> to enable the Deep Learning model.
+                        </p>
+                      ) : (
+                        <p className="text-[10px] text-white/30 uppercase tracking-widest">
+                          Active model: <span className="text-gold font-bold">{(profile?.model_tier ?? 'svm').toUpperCase()}</span>
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -7,6 +7,7 @@ type ProfileLite = {
   filter_enabled: boolean;
   plan: string;
   plan_expires_at: string | null;
+  model_tier: string | null;
 };
 
 /**
@@ -15,7 +16,7 @@ type ProfileLite = {
 export async function findProfileByWebhookToken(token: string): Promise<ProfileLite | null> {
   const { data, error } = await supabaseAdmin
     .from('profiles')
-    .select('id, filter_enabled, plan, plan_expires_at')
+    .select('id, filter_enabled, plan, plan_expires_at, model_tier')
     .eq('webhook_token', token)
     .maybeSingle();
   if (error || !data) return null;
@@ -40,7 +41,9 @@ export async function processDonation(profile: ProfileLite, d: Donation) {
       profile.plan === 'premium' &&
       profile.plan_expires_at !== null &&
       new Date(profile.plan_expires_at) > new Date();
-    const modelTier = isPremium ? 'dl' : 'svm';
+    // Free users are locked to SVM. Premium users use their stored preference (default dl).
+    const requestedTier = (profile.model_tier ?? 'svm') as 'svm' | 'dl';
+    const modelTier = isPremium ? requestedTier : 'svm';
 
     filterResult = await filterDonation(d.donator, d.message, customBlocklist, [], true, modelTier);
   }

@@ -5,7 +5,7 @@ export const PLAN_LIMITS = {
   premium: { blocklist: 500 },
 } as const;
 
-export const PREMIUM_PRICE_IDR = 29_000;
+export const PREMIUM_PRICE_USD = 10;
 
 export function isActivePremium(plan: Plan, planExpiresAt: string | null): boolean {
   if (plan !== 'premium') return false;

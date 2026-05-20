@@ -10,6 +10,7 @@ export type Database = {
           filter_enabled: boolean;
           plan: 'free' | 'premium';
           plan_expires_at: string | null;
+          model_tier: 'svm' | 'dl';
           created_at: string;
           updated_at: string;
         };
@@ -21,6 +22,7 @@ export type Database = {
           filter_enabled?: boolean;
           plan?: 'free' | 'premium';
           plan_expires_at?: string | null;
+          model_tier?: 'svm' | 'dl';
           created_at?: string;
           updated_at?: string;
         };
@@ -32,6 +34,7 @@ export type Database = {
           filter_enabled?: boolean;
           plan?: 'free' | 'premium';
           plan_expires_at?: string | null;
+          model_tier?: 'svm' | 'dl';
           created_at?: string;
           updated_at?: string;
         };

@@ -5,6 +5,7 @@ import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useAuth } from '../lib/auth';
 import { useProfile } from '../lib/profile';
+import { isActivePremium } from '../lib/plan';
 import { Footer } from './Footer';
 
 function cn(...inputs: (string | undefined | null | false)[]) {
@@ -24,6 +25,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { profile } = useProfile();
+  const isPremium = isActivePremium(profile?.plan ?? 'free', profile?.plan_expires_at ?? null);
 
   async function handleLogout() {
     await signOut();
@@ -87,8 +89,15 @@ export function Layout({ children }: { children: ReactNode }) {
               Support
             </a>
             {profile && (
-              <div className="px-4 py-2 text-[10px] text-white/30 font-label uppercase tracking-widest truncate">
-                @{profile.username}
+              <div className="px-4 py-2 flex items-center gap-2 truncate">
+                <span className="text-[10px] text-white/30 font-label uppercase tracking-widest truncate">
+                  @{profile.username}
+                </span>
+                {isPremium && (
+                  <span className="shrink-0 px-1.5 py-0.5 rounded bg-gold/20 border border-gold/40 text-[8px] font-black text-gold uppercase tracking-widest">
+                    Pro
+                  </span>
+                )}
               </div>
             )}
             <button

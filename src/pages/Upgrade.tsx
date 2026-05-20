@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { supabase } from '../lib/supabase';
 import { useProfile } from '../lib/profile';
-import { isActivePremium, PREMIUM_PRICE_IDR } from '../lib/plan';
+import { isActivePremium, PREMIUM_PRICE_USD } from '../lib/plan';
 
 declare global {
   interface Window {
@@ -64,8 +64,6 @@ const BENEFITS: Benefit[] = [
   },
 ];
 
-const rupiah = (n: number) =>
-  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n);
 
 export function Upgrade() {
   const { profile, refresh } = useProfile();
@@ -144,9 +142,16 @@ export function Upgrade() {
 
       setStatus('idle');
       window.snap!.pay(json.snap_token, {
-        onSuccess: async () => {
-          await refresh();
+        onSuccess: () => {
           setStatus('success');
+          // Poll until notification webhook updates the plan (up to 30s)
+          let attempts = 0;
+          const poll = () => {
+            attempts++;
+            refresh();
+            if (attempts < 15) setTimeout(poll, 2000);
+          };
+          setTimeout(poll, 1500);
         },
         onPending: () => {
           setStatus('pending');
@@ -249,7 +254,7 @@ export function Upgrade() {
                   <div>
                     <div className="flex items-end gap-2">
                       <span className="text-4xl font-black font-display text-on-surface">
-                        {rupiah(PREMIUM_PRICE_IDR)}
+                        ${PREMIUM_PRICE_USD}
                       </span>
                     </div>
                     <p className="text-white/40 text-xs mt-1 font-label uppercase tracking-widest">per month</p>
