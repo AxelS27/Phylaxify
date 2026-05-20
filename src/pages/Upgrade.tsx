@@ -124,14 +124,18 @@ export function Upgrade() {
       const json = await res.json() as {
         snap_token?: string;
         error?: string;
+        detail?: string;
         expires_at?: string;
       };
 
       if (!res.ok) {
         if (json.error === 'already_premium') {
-          setErrorMsg(`Already active until ${json.expires_at ? new Date(json.expires_at).toLocaleDateString('id-ID') : '-'}`);
+          setErrorMsg(`Sudah aktif sampai ${json.expires_at ? new Date(json.expires_at).toLocaleDateString('id-ID') : '-'}`);
           setStatus('idle');
           return;
+        }
+        if (json.error === 'midtrans_error') {
+          throw new Error(`Midtrans: ${json.detail ?? 'unknown error'}`);
         }
         throw new Error(json.error ?? 'Unknown error');
       }

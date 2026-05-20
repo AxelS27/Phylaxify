@@ -84,7 +84,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!snapRes.ok) {
     const text = await snapRes.text();
     console.error('[create-transaction] Midtrans error:', text.slice(0, 300));
-    return res.status(502).json({ error: 'midtrans_error' });
+    let detail = `HTTP ${snapRes.status}`;
+    try {
+      const parsed = JSON.parse(text);
+      detail = parsed.error_messages?.join(', ') ?? parsed.message ?? detail;
+    } catch { /* not JSON */ }
+    return res.status(502).json({ error: 'midtrans_error', detail });
   }
 
   const { token: snapToken, redirect_url } = await snapRes.json() as {
