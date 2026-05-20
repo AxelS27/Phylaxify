@@ -48,8 +48,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .single();
 
   if (!sub) {
+    // Unknown order (e.g. Midtrans test ping) — ack with 200 so Midtrans stops retrying
     console.warn('[notification] unknown order_id:', body.order_id);
-    return res.status(404).json({ error: 'order not found' });
+    return res.status(200).json({ ok: true });
   }
 
   // Idempotent: skip if already processed
