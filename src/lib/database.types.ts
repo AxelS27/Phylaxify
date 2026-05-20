@@ -8,6 +8,8 @@ export type Database = {
           webhook_token: string;
           overlay_token: string;
           filter_enabled: boolean;
+          plan: 'free' | 'premium';
+          plan_expires_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -17,6 +19,8 @@ export type Database = {
           webhook_token?: string;
           overlay_token?: string;
           filter_enabled?: boolean;
+          plan?: 'free' | 'premium';
+          plan_expires_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -26,6 +30,8 @@ export type Database = {
           webhook_token?: string;
           overlay_token?: string;
           filter_enabled?: boolean;
+          plan?: 'free' | 'premium';
+          plan_expires_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -64,6 +70,36 @@ export type Database = {
         Update: {
           blocked?: boolean;
           manually_approved?: boolean;
+        };
+      };
+      subscriptions: {
+        Row: {
+          id: number;
+          user_id: string;
+          order_id: string;
+          status: 'pending' | 'paid' | 'expired' | 'cancel' | 'deny';
+          amount: number;
+          snap_token: string | null;
+          created_at: string;
+          paid_at: string | null;
+          expires_at: string | null;
+        };
+        Insert: {
+          id?: number;
+          user_id: string;
+          order_id: string;
+          status?: string;
+          amount: number;
+          snap_token?: string | null;
+          created_at?: string;
+          paid_at?: string | null;
+          expires_at?: string | null;
+        };
+        Update: {
+          status?: string;
+          snap_token?: string | null;
+          paid_at?: string | null;
+          expires_at?: string | null;
         };
       };
       blocklist: {

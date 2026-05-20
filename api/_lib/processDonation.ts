@@ -5,6 +5,8 @@ import type { Donation } from './providers.js';
 type ProfileLite = {
   id: string;
   filter_enabled: boolean;
+  plan: string;
+  plan_expires_at: string | null;
 };
 
 /**
@@ -13,7 +15,7 @@ type ProfileLite = {
 export async function findProfileByWebhookToken(token: string): Promise<ProfileLite | null> {
   const { data, error } = await supabaseAdmin
     .from('profiles')
-    .select('id, filter_enabled')
+    .select('id, filter_enabled, plan, plan_expires_at')
     .eq('webhook_token', token)
     .maybeSingle();
   if (error || !data) return null;
@@ -34,7 +36,13 @@ export async function processDonation(profile: ProfileLite, d: Donation) {
       .eq('user_id', profile.id);
     const customBlocklist = (blocklistRows ?? []).map((r: any) => r.word as string);
 
-    filterResult = await filterDonation(d.donator, d.message, customBlocklist, [], true);
+    const isPremium =
+      profile.plan === 'premium' &&
+      profile.plan_expires_at !== null &&
+      new Date(profile.plan_expires_at) > new Date();
+    const modelTier = isPremium ? 'dl' : 'svm';
+
+    filterResult = await filterDonation(d.donator, d.message, customBlocklist, [], true, modelTier);
   }
 
   const insertPayload = {

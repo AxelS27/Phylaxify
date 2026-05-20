@@ -177,9 +177,14 @@ function checkPatterns(v: Variants):
 
 // ────────────── Layer 3: ML ──────────────
 
-async function checkML(message: string): Promise<FilterResult | null> {
-  const apiUrl = process.env.JUDOL_ML_API_URL;
-  if (!apiUrl) return null; // ML not deployed yet
+async function checkML(message: string, tier: 'svm' | 'dl' = 'svm'): Promise<FilterResult | null> {
+  // SVM uses JUDOL_SVM_API_URL, falling back to legacy JUDOL_ML_API_URL.
+  // DL uses JUDOL_DL_API_URL (premium only).
+  const apiUrl =
+    tier === 'dl'
+      ? process.env.JUDOL_DL_API_URL
+      : (process.env.JUDOL_SVM_API_URL ?? process.env.JUDOL_ML_API_URL);
+  if (!apiUrl) return null;
 
   const timeoutMs = parseInt(process.env.JUDOL_ML_TIMEOUT_MS ?? '2000', 10);
   const threshold = parseFloat(process.env.JUDOL_ML_CONFIDENCE_THRESHOLD ?? '0.7');
@@ -206,17 +211,17 @@ async function checkML(message: string): Promise<FilterResult | null> {
       const summary =
         matched_patterns && matched_patterns.length > 0
           ? matched_patterns.slice(0, 3).join(', ')
-          : 'ML classifier';
+          : `ML ${tier.toUpperCase()}`;
       return {
         blocked: true,
-        reason: `ML: ${summary} (${confidence.toFixed(2)})`,
+        reason: `ML ${tier.toUpperCase()}: ${summary} (${confidence.toFixed(2)})`,
         confidence,
         layer: 'ml',
       };
     }
     return {
       blocked: false,
-      reason: 'ml: clean',
+      reason: `ml ${tier}: clean`,
       confidence: typeof confidence === 'number' ? confidence : 0,
       layer: 'ml',
     };
@@ -238,6 +243,7 @@ export async function filterMessage(
   customBlocklist: string[] = [],
   customWhitelist: string[] = [],
   enableML = true,
+  modelTier: 'svm' | 'dl' = 'svm',
 ): Promise<FilterResult> {
   if (!message || message.trim() === '') {
     return { blocked: false, reason: 'empty message', confidence: 1, layer: 'none' };
@@ -296,7 +302,7 @@ export async function filterMessage(
   }
 
   if (enableML) {
-    const ml = await checkML(message);
+    const ml = await checkML(message, modelTier);
     if (ml && ml.blocked) return ml;
   }
 
@@ -312,16 +318,11 @@ export async function filterDonation(
   customBlocklist: string[] = [],
   customWhitelist: string[] = [],
   enableML = true,
+  modelTier: 'svm' | 'dl' = 'svm',
 ): Promise<FilterResult> {
-  // 1. Check Name first (names are shorter, usually catch obvious link spammers)
-  const nameResult = await filterMessage(name, customBlocklist, customWhitelist, enableML);
+  const nameResult = await filterMessage(name, customBlocklist, customWhitelist, enableML, modelTier);
   if (nameResult.blocked) {
-    return {
-      ...nameResult,
-      reason: `Name: ${nameResult.reason}`,
-    };
+    return { ...nameResult, reason: `Name: ${nameResult.reason}` };
   }
-
-  // 2. Check Message
-  return await filterMessage(message, customBlocklist, customWhitelist, enableML);
+  return filterMessage(message, customBlocklist, customWhitelist, enableML, modelTier);
 }
