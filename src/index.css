@@ -147,9 +147,16 @@
   color-scheme: light;
   --color-background-color: #F3EDE3;
   --color-on-surface: #1A1410;
-  --color-on-surface-variant: #5C5040;
+  --color-on-surface-variant: #4F4638;
   --color-surface: #EAE3D8;
   --color-surface-dim: #E2DBD0;
+  --color-surface-container-lowest: #EAE3D8;
+  --color-surface-container-low: #EFE8DE;
+  --color-surface-container: #F7F1E8;
+  --color-surface-container-high: #FFF9F0;
+  --color-surface-container-highest: #FFFDF8;
+  --color-surface-variant: #E0D6C7;
+  --color-primary-container: #E6D6A4;
   --color-outline: rgba(0,0,0,0.12);
   --color-glass: rgba(255,255,255,0.5);
   --color-error: #B3261E;
@@ -165,13 +172,121 @@
 }
 
 [data-theme="light"] .liquid-glass {
-  background: rgba(255, 255, 255, 0.55);
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  background: rgba(255, 252, 246, 0.86);
+  border-color: rgba(82, 62, 24, 0.14) !important;
+  box-shadow: 0 10px 30px rgba(82, 62, 24, 0.08);
 }
 
 [data-theme="light"] .liquid-glass-cine {
-  background: rgba(255,255,255,0.4);
+  background: rgba(255, 252, 246, 0.64);
+}
+
+/* Footer — keep dark bg overridden to match cream theme */
+[data-theme="light"] footer {
+  background-color: #EAE3D8 !important;
+  border-top-color: rgba(0,0,0,0.1) !important;
+  color: #2A200F;
+}
+[data-theme="light"] footer .text-white {
+  color: #1A1410 !important;
+}
+
+/* Flip white-opacity text → dark-based text */
+[data-theme="light"] .text-white,
+[data-theme="light"] [class~="text-white"] {
+  color: #1A1410 !important;
+}
+
+[data-theme="light"] [class~="text-white/90"] {
+  color: rgba(26, 20, 10, 0.92) !important;
+}
+
+[data-theme="light"] [class~="text-white/80"] {
+  color: rgba(26, 20, 10, 0.84) !important;
+}
+
+[data-theme="light"] [class~="text-white/70"],
+[data-theme="light"] [class~="text-white/60"] {
+  color: rgba(26, 20, 10, 0.72) !important;
+}
+
+[data-theme="light"] [class~="text-white/50"],
+[data-theme="light"] [class~="text-white/40"] {
+  color: rgba(26, 20, 10, 0.64) !important;
+}
+
+[data-theme="light"] [class~="text-white/30"] {
+  color: rgba(26, 20, 10, 0.52) !important;
+}
+
+[data-theme="light"] [class~="text-white/20"] {
+  color: rgba(26, 20, 10, 0.42) !important;
+}
+
+/* Flip white-opacity borders → dark borders */
+[data-theme="light"] [class*="border-white/"] {
+  border-color: rgba(82, 62, 24, 0.12) !important;
+}
+
+/* Flip white-opacity backgrounds → very subtle dark */
+[data-theme="light"] [class~="bg-white/5"],
+[data-theme="light"] [class~="bg-white/[0.02]"],
+[data-theme="light"] [class~="bg-white/[0.03]"] {
+  background-color: rgba(122, 82, 0, 0.07) !important;
+}
+
+[data-theme="light"] [class~="bg-white/10"] {
+  background-color: rgba(122, 82, 0, 0.11) !important;
+}
+
+/* Preserve gold accents on active sidebar items */
+[data-theme="light"] .text-gold,
+[data-theme="light"] [class*="text-gold"] {
+  color: var(--color-gold) !important;
+}
+
+/* Preserve error color */
+[data-theme="light"] .text-error {
+  color: var(--color-error) !important;
+}
+
+/* Sidebar border */
+[data-theme="light"] aside {
+  border-color: rgba(0,0,0,0.08) !important;
+}
+
+/* Dark hard-coded panels and inputs need to become light surfaces in light mode. */
+[data-theme="light"] [class*="bg-[#111111]"],
+[data-theme="light"] [class*="bg-[#0A0A0A]"] {
+  background-color: #FFF9F0 !important;
+}
+
+[data-theme="light"] [class*="border-[#222222]"] {
+  border-color: rgba(82, 62, 24, 0.16) !important;
+}
+
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  color: var(--color-on-surface);
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: rgba(26, 20, 10, 0.38) !important;
+}
+
+/* surface-container-lowest override */
+[data-theme="light"] .bg-surface-container-lowest {
+  background-color: #EAE3D8 !important;
+}
+
+[data-theme="light"] .bg-background-color {
+  background-color: var(--color-background-color) !important;
+}
+
+[data-theme="light"] .text-on-surface-variant {
+  color: var(--color-on-surface-variant) !important;
 }
 
 /* ── Reduce-motion (app-controlled) ─────────────────────────────────────── */
