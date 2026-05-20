@@ -42,7 +42,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'already_premium', expires_at: profile.plan_expires_at });
   }
 
-  const orderId = `phylaxify-premium-${user.id}-${Date.now()}`;
+  // Max 50 chars: "phy-" + 8 chars user id + "-" + base36 timestamp = ~22 chars
+  const orderId = `phy-${user.id.replace(/-/g, '').slice(0, 8)}-${Date.now().toString(36)}`;
   const appUrl = process.env.VITE_APP_URL ?? '';
 
   // Insert pending subscription
