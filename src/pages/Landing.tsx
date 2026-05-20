@@ -3,6 +3,7 @@ import { useAuth } from '../lib/auth';
 import { useEffect, useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { Github, Menu, X, Shield, Clock, Calendar, Play, Settings as SettingsIcon, Sun, Moon, Zap, Leaf, Check } from 'lucide-react';
+import { usePreferences } from '../lib/preferences';
 import { Footer } from '../components/Footer';
 
 export function Landing() {
@@ -13,9 +14,7 @@ export function Landing() {
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [scrolled, setScrolled] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  // This is only prototype
-  const [prefTheme, setPrefTheme] = useState<'dark' | 'light'>('dark');
-  const [prefMotion, setPrefMotion] = useState<'strong' | 'weak'>('strong');
+  const { theme: prefTheme, motion: prefMotion, setTheme: setPrefTheme, setMotion: setPrefMotion } = usePreferences();
   const settingsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -250,7 +249,7 @@ export function Landing() {
               </div>
 
               <p className="mt-4 pt-3 border-t border-white/10 text-[10px] text-white/30 leading-relaxed">
-                These settings are still in the prototype stage. Changes are not yet applied.
+                Preferences are saved locally and applied across the app.
               </p>
             </div>
           </div>

@@ -153,7 +153,10 @@
   --color-outline: rgba(0,0,0,0.12);
   --color-glass: rgba(255,255,255,0.5);
   --color-error: #B3261E;
-  --color-tertiary: #8B6200;
+  --color-tertiary: #7A5C00;
+  /* Gold becomes dark amber in light mode — readable on cream bg */
+  --color-gold: #7A5200;
+  --color-tertiary-fixed-dim: #7A5200;
 }
 
 [data-theme="light"] body {
