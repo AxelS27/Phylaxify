@@ -253,6 +253,49 @@ def make_input(s: str) -> str:
     return f"{a} | {b}"
 
 
+# Deployment SVM preprocessing. This mirrors the Level 3 preprocessing used in
+# D:\Binus-Projects\NLP\train_svm_level3_deploy.py so inference matches training.
+_SVM_TIER3 = {"vv": "w", "|3": "b", "ph": "f", "ck": "k"}
+_SVM_TIER1 = {
+    "1": "i",
+    "3": "e",
+    "4": "a",
+    "5": "s",
+    "0": "o",
+    "7": "t",
+    "6": "b",
+    "9": "g",
+}
+_SVM_TIER2 = {"@": "a", "|": "l", "!": "i", "$": "s", "+": "t"}
+
+
+def _apply_svm_leet_normalization(text: str) -> str:
+    for _ in range(3):
+        for old, new in _SVM_TIER3.items():
+            text = text.replace(old, new)
+        for old, new in _SVM_TIER1.items():
+            text = text.replace(old, new)
+        for old, new in _SVM_TIER2.items():
+            text = text.replace(old, new)
+    return text
+
+
+def preprocess_level3(text: str) -> str:
+    text = str(text).lower()
+    text = re.sub(r"http\S+|www\S+", "", text)
+    text = re.sub(r"&\w+;", "", text)
+    text = re.sub(r"[^\w\s]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    text = _apply_svm_leet_normalization(text)
+    text = re.sub(r"(.)\1{2,}", r"\1\1", text)
+    text = unicodedata.normalize("NFKD", text)
+    text = text.encode("ascii", "ignore").decode("ascii")
+    text = re.sub(r"\b(\w\.){2,}\w\b", lambda m: m.group().replace(".", ""), text)
+    text = re.sub(r"\b(\w-){2,}\w\b", lambda m: m.group().replace("-", ""), text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
 if __name__ == "__main__":
     samples = [
         "Makin yakin abis baca review lain tentang ✌✌\U0001D412\U0001D406\U0001D408\U0001D7D6\U0001D7D6.",

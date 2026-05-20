@@ -3,5 +3,7 @@ node_modules
 dist
 dist-ssr
 *.local
-hf-space/models
+hf-space/models/*
+!hf-space/models/svm_level3.joblib
+!hf-space/models/svm_level3_report.json
 hf-space/models_old
