@@ -63,16 +63,28 @@ export function Layout({ children }: { children: ReactNode }) {
         </nav>
         
         <div className="mt-auto flex flex-col gap-4">
-          <div className="p-4 rounded-xl bg-gradient-to-br from-gold/20 to-transparent border border-gold/30 relative overflow-hidden">
-             <div className="greek-meander absolute inset-0 opacity-10"></div>
-             <p className="text-[10px] text-gold font-bold uppercase mb-2 relative z-10">Premium Access</p>
-             <Link
+          {isPremium ? (
+            <div className="p-4 rounded-xl bg-gradient-to-br from-gold/20 to-transparent border border-gold/30 relative overflow-hidden">
+              <div className="greek-meander absolute inset-0 opacity-10"></div>
+              <p className="text-[10px] text-gold font-bold uppercase mb-1 relative z-10">Premium Active</p>
+              <p className="text-[9px] text-white/40 uppercase tracking-widest relative z-10">
+                {profile?.plan_expires_at
+                  ? `Expires ${new Date(profile.plan_expires_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`
+                  : ''}
+              </p>
+            </div>
+          ) : (
+            <div className="p-4 rounded-xl bg-gradient-to-br from-gold/20 to-transparent border border-gold/30 relative overflow-hidden">
+              <div className="greek-meander absolute inset-0 opacity-10"></div>
+              <p className="text-[10px] text-gold font-bold uppercase mb-2 relative z-10">Premium Access</p>
+              <Link
                 to="/upgrade"
                 className="block text-center w-full bg-gold text-[#0A0A0A] font-label py-2 rounded-lg uppercase tracking-widest text-[10px] font-bold hover:brightness-110 transition-all relative z-10 shadow-[0_0_10px_rgba(201,168,76,0.2)]"
-             >
+              >
                 Upgrade Now
-            </Link>
-          </div>
+              </Link>
+            </div>
+          )}
           
           <div className="flex flex-col gap-1 border-t border-white/5 pt-4">
             <Link to="/?stay=true" className="flex items-center gap-3 px-4 py-2 text-white/40 hover:text-white/80 transition-all font-label text-[10px] uppercase tracking-widest">

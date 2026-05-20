@@ -242,12 +242,14 @@ export function Upgrade() {
                     </div>
                   )}
                   <button
-                    onClick={handleSubscribe}
-                    disabled={status === 'loading'}
-                    className="w-full py-3 rounded-xl border border-gold/30 text-gold font-label text-xs uppercase tracking-widest hover:bg-gold/10 transition-all disabled:opacity-50"
+                    disabled
+                    className="w-full py-3 rounded-xl border border-error/20 text-error/50 font-label text-xs uppercase tracking-widest cursor-not-allowed opacity-50"
                   >
-                    {status === 'loading' ? 'Processing...' : 'Renew Early'}
+                    Cancel Subscription
                   </button>
+                  <p className="text-[9px] text-white/20 text-center uppercase tracking-widest">
+                    Contact support to cancel
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-6">
