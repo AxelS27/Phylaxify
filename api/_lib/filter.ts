@@ -5,7 +5,8 @@
 //   Layer 1: per-user custom blocklist
 //   Layer 2a: hardcoded keywords (HIGH + CONTEXT)
 //   Layer 2b: regex patterns
-//   Layer 3: ML classifier (HF Spaces) — skipped if JUDOL_ML_API_URL unset
+//   Layer 3: ML classifier (local SVM on Vercel, optional HF Space for DL)
+import { predictLocalSvm } from './localSvm.js';
 
 export type FilterLayer =
   | 'none'
@@ -188,14 +189,36 @@ async function checkML(
   tier: 'svm' | 'dl' = 'svm',
   sensitivity: 'loose' | 'normal' | 'strict' = 'normal',
 ): Promise<FilterResult | null> {
-  const apiUrl =
-    tier === 'dl'
-      ? process.env.JUDOL_DL_API_URL
-      : (process.env.JUDOL_SVM_API_URL ?? process.env.JUDOL_ML_API_URL);
+  const threshold = SENSITIVITY_THRESHOLDS[sensitivity] ?? parseFloat(process.env.JUDOL_ML_CONFIDENCE_THRESHOLD ?? '0.7');
+
+  if (tier === 'svm') {
+    try {
+      const result = predictLocalSvm(message);
+      if (result.label === 'JUDOL' && result.confidence >= threshold) {
+        return {
+          blocked: true,
+          reason: `ML SVM local: SVM Level 3 (${result.confidence.toFixed(2)})`,
+          confidence: result.confidence,
+          layer: 'ml',
+        };
+      }
+      return {
+        blocked: false,
+        reason: 'ml svm local: clean',
+        confidence: result.confidence,
+        layer: 'ml',
+      };
+    } catch (err) {
+      const msg = (err as Error).message;
+      console.warn(`[filter] Local SVM skipped — ${msg}`);
+      return { blocked: false, reason: `local svm unavailable: ${msg}`, confidence: 0, layer: 'ml_fallback' };
+    }
+  }
+
+  const apiUrl = process.env.JUDOL_DL_API_URL ?? process.env.JUDOL_ML_API_URL;
   if (!apiUrl) return null;
 
   const timeoutMs = parseInt(process.env.JUDOL_ML_TIMEOUT_MS ?? '2000', 10);
-  const threshold = SENSITIVITY_THRESHOLDS[sensitivity] ?? parseFloat(process.env.JUDOL_ML_CONFIDENCE_THRESHOLD ?? '0.7');
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -312,7 +335,7 @@ export async function filterMessage(
 
   if (enableML) {
     const ml = await checkML(message, modelTier, sensitivity);
-    if (ml && ml.blocked) return ml;
+    if (ml) return ml;
   }
 
   return { blocked: false, reason: 'clean', confidence: 0.9, layer: 'none' };
