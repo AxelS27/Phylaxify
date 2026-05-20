@@ -242,17 +242,17 @@ async function checkML(
       const summary =
         matched_patterns && matched_patterns.length > 0
           ? matched_patterns.slice(0, 3).join(', ')
-          : `ML ${tier.toUpperCase()}`;
+          : 'JUDOL';
       return {
         blocked: true,
-        reason: `ML ${tier.toUpperCase()}: ${summary} (${confidence.toFixed(2)})`,
+        reason: `DL IndoBERT: ${summary} (${confidence.toFixed(2)})`,
         confidence,
         layer: 'ml',
       };
     }
     return {
       blocked: false,
-      reason: `ml ${tier}: clean`,
+      reason: 'DL IndoBERT: clean',
       confidence: typeof confidence === 'number' ? confidence : 0,
       layer: 'ml',
     };
