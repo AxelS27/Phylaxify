@@ -8,11 +8,42 @@ type TestResult = {
   donation: { id: number; donator_name: string; amount: number; message: string };
 };
 
-const PRESETS: Record<string, { donator: string; amount: number; message: string }> = {
-  clean: { donator: 'Athena', amount: 50000, message: 'Keep up the good work!' },
-  judol: { donator: 'Spammer_99', amount: 5000, message: 'join alexis17 gacor maxwin now' },
-  spam: { donator: 'BotX', amount: 1000, message: 'WA: 081234567890 link: https://bit.ly/abc' },
+const PRESETS = {
+  clean: [
+    { donator: 'Athena', amount: 50000, message: 'Keep up the good work!' },
+    { donator: 'Bima', amount: 25000, message: 'Makasih bang, streamnya seru banget malam ini.' },
+    { donator: 'Citra', amount: 75000, message: 'Semangat terus ya, jangan lupa istirahat.' },
+    { donator: 'Dimas', amount: 15000, message: 'Request lagu boleh gak? Sukses selalu!' },
+    { donator: 'Elara', amount: 100000, message: 'Kontennya makin rapi, proud of you.' },
+    { donator: 'Raka', amount: 30000, message: 'Halo kak, cuma mau support sedikit.' },
+    { donator: 'Naya', amount: 45000, message: 'Mantap pembahasannya, sangat membantu.' },
+    { donator: 'Orion', amount: 20000, message: 'Good vibes terus, terima kasih sudah nemenin.' },
+  ],
+  judol: [
+    { donator: 'Spammer_99', amount: 5000, message: 'join alexis17 gacor maxwin now' },
+    { donator: 'cuanHunter', amount: 10000, message: 'main di gw pasti mantapp dan cuann' },
+    { donator: 'RTP_Live', amount: 7777, message: 'rtp live slot hari ini bocoran pola gacor' },
+    { donator: 'BonusNew', amount: 12000, message: 'bonus new member 100% depo kecil auto maxwin' },
+    { donator: 's1otMantul', amount: 8888, message: 's1ot g4c0r modal 10rb wd jutaan' },
+    { donator: 'AdminWin', amount: 25000, message: 'link alternatif anti rungkad, daftar sekarang' },
+    { donator: 'ScatterPro', amount: 50000, message: 'scatter hitam muncul terus, jam gacor malam ini' },
+    { donator: 'M4xW1n', amount: 9000, message: 'm4xw1n gampang banget bro, langsung wd cepat' },
+  ],
+  spam: [
+    { donator: 'BotX', amount: 1000, message: 'WA: 081234567890 link: https://bit.ly/abc' },
+    { donator: 'PromoBlast', amount: 1000, message: 'klik sekarang hadiah terbatas http://short.ly/freegift' },
+    { donator: 'LoanFast', amount: 2000, message: 'pinjaman cepat tanpa bi checking cair 5 menit' },
+    { donator: 'AkunBaru', amount: 1500, message: 'follow akun ini sekarang dan dapat bonus spesial' },
+    { donator: 'MassDM', amount: 3000, message: 'chat admin 0812-9999-8888 promo cuma hari ini' },
+    { donator: 'LinkDrop', amount: 2500, message: 'cek link: https://tinyurl.com/promo-live jangan sampai telat' },
+    { donator: 'CopyPaste', amount: 1000, message: 'GRATIS GRATIS GRATIS klaim sekarang sebelum hangus' },
+    { donator: 'Unknown', amount: 500, message: 'open jasa murah fast respon wa me now' },
+  ],
 };
+
+function pickRandom<T>(items: T[]): T {
+  return items[Math.floor(Math.random() * items.length)];
+}
 
 export function TestLab() {
   const { profile } = useProfile();
@@ -25,7 +56,7 @@ export function TestLab() {
   const [elapsed, setElapsed] = useState<number | null>(null);
 
   function applyPreset(key: keyof typeof PRESETS) {
-    const p = PRESETS[key];
+    const p = pickRandom(PRESETS[key]);
     setDonator(p.donator);
     setAmount(p.amount);
     setMessage(p.message);
