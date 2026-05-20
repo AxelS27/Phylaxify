@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { supabase } from '../lib/supabase';
 import { useProfile } from '../lib/profile';
-import { isActivePremium, PREMIUM_PRICE_USD } from '../lib/plan';
+import { isActivePremium, PREMIUM_PRICE_IDR } from '../lib/plan';
 
 declare global {
   interface Window {
@@ -254,7 +254,7 @@ export function Upgrade() {
                   <div>
                     <div className="flex items-end gap-2">
                       <span className="text-4xl font-black font-display text-on-surface">
-                        ${PREMIUM_PRICE_USD}
+                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(PREMIUM_PRICE_IDR)}
                       </span>
                     </div>
                     <p className="text-white/40 text-xs mt-1 font-label uppercase tracking-widest">per month</p>

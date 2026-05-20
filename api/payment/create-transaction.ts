@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { supabaseAdmin } from '../_lib/supabaseAdmin.js';
 
-const PREMIUM_PRICE_USD = 10;
+const PREMIUM_PRICE_IDR = 150_000;
 
 function getMidtransBaseUrl(): string {
   const isProd = process.env.VITE_MIDTRANS_IS_PRODUCTION === 'true';
@@ -51,7 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     user_id: user.id,
     order_id: orderId,
     status: 'pending',
-    amount: PREMIUM_PRICE_USD,
+    amount: PREMIUM_PRICE_IDR,
   });
   if (insertError) {
     console.error('[create-transaction] insert failed:', insertError);
@@ -60,12 +60,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Call Midtrans SNAP API
   const snapPayload = {
-    transaction_details: { order_id: orderId, gross_amount: PREMIUM_PRICE_USD, currency: 'USD' },
+    transaction_details: { order_id: orderId, gross_amount: PREMIUM_PRICE_IDR },
     item_details: [{
       id: 'phylaxify-premium-monthly',
-      price: PREMIUM_PRICE_USD,
+      price: PREMIUM_PRICE_IDR,
       quantity: 1,
-      name: 'Phylaxify Premium — 30 Days',
+      name: 'Phylaxify Premium — 30 Hari',
     }],
     customer_details: {
       first_name: profile.username,
