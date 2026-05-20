@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { clsx } from 'clsx';
@@ -6,6 +6,7 @@ import { twMerge } from 'tailwind-merge';
 import { useAuth } from '../lib/auth';
 import { useProfile } from '../lib/profile';
 import { isActivePremium } from '../lib/plan';
+import { usePreferences } from '../lib/preferences';
 import { Footer } from './Footer';
 
 function cn(...inputs: (string | undefined | null | false)[]) {
@@ -26,6 +27,8 @@ export function Layout({ children }: { children: ReactNode }) {
   const { signOut } = useAuth();
   const { profile } = useProfile();
   const isPremium = isActivePremium(profile?.plan ?? 'free', profile?.plan_expires_at ?? null);
+  const { theme, motion: motionPref, setTheme, setMotion } = usePreferences();
+  const [prefOpen, setPrefOpen] = useState(false);
 
   async function handleLogout() {
     await signOut();
@@ -100,6 +103,66 @@ export function Layout({ children }: { children: ReactNode }) {
               <span className="material-symbols-outlined text-sm">help</span>
               Support
             </a>
+
+            {/* Preferences popover */}
+            <div className="relative">
+              <button
+                onClick={() => setPrefOpen((v) => !v)}
+                className="w-full flex items-center gap-3 px-4 py-2 text-white/40 hover:text-white/80 transition-all font-label text-[10px] uppercase tracking-widest text-left"
+              >
+                <span className="material-symbols-outlined text-sm">display_settings</span>
+                Preferences
+              </button>
+
+              {prefOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setPrefOpen(false)} />
+                  <div className="absolute bottom-full left-0 mb-2 w-56 bg-[#111111] border border-white/10 rounded-2xl shadow-2xl z-50 p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-label text-[10px] uppercase tracking-widest text-white/60">Preferences</span>
+                      <span className="px-1.5 py-0.5 rounded bg-gold/10 border border-gold/20 text-[8px] font-bold text-gold uppercase">Beta</span>
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="font-label text-[9px] uppercase tracking-widest text-white/30">Theme</p>
+                      <div className="flex gap-1.5">
+                        {(['dark', 'light'] as const).map((t) => (
+                          <button
+                            key={t}
+                            onClick={() => setTheme(t)}
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                              theme === t ? 'bg-gold text-[#0A0A0A]' : 'bg-white/5 text-white/40 hover:bg-white/10'
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-sm">{t === 'dark' ? 'dark_mode' : 'light_mode'}</span>
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="font-label text-[9px] uppercase tracking-widest text-white/30">Motion</p>
+                      <div className="flex gap-1.5">
+                        {(['strong', 'weak'] as const).map((m) => (
+                          <button
+                            key={m}
+                            onClick={() => setMotion(m)}
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                              motionPref === m ? 'bg-gold text-[#0A0A0A]' : 'bg-white/5 text-white/40 hover:bg-white/10'
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-sm">{m === 'strong' ? 'animation' : 'motion_photos_off'}</span>
+                            {m}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
             {profile && (
               <div className="px-4 py-2 flex items-center gap-2 truncate">
                 <span className="text-[10px] text-white/30 font-label uppercase tracking-widest truncate">

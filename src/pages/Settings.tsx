@@ -117,45 +117,58 @@ export function Settings() {
                   Every incoming donation passes through 3 layers: Custom Blocklist → Regex Patterns → ML Neural Shield.
                 </p>
 
-                {/* ML / DL pill toggle */}
+                {/* ML / DL card selector */}
                 <div className="space-y-3">
                   <label className="font-label text-[10px] text-white/40 uppercase tracking-[0.2em]">Layer 3 — Neural Model</label>
-                  <div className="flex items-center gap-4">
-                    <div className={`flex p-1 rounded-full border ${isPremium ? 'bg-white/5 border-white/10' : 'bg-white/5 border-white/5'}`}>
-                      <button
-                        onClick={() => setModelTier('svm')}
-                        className={`px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
-                          (profile?.model_tier ?? 'svm') === 'svm'
-                            ? 'bg-white/20 text-white shadow-sm'
-                            : 'text-white/30 hover:text-white/60'
-                        }`}
-                      >
-                        ML
-                      </button>
-                      <button
-                        onClick={() => isPremium && setModelTier('dl')}
-                        className={`relative px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
-                          (profile?.model_tier ?? 'svm') === 'dl'
-                            ? 'bg-gold text-[#0A0A0A] shadow-[0_0_10px_rgba(201,168,76,0.4)]'
-                            : isPremium
-                              ? 'text-white/30 hover:text-white/60'
-                              : 'text-white/15 cursor-not-allowed'
-                        }`}
-                      >
-                        {!isPremium && <span className="material-symbols-outlined text-[10px] mr-1" style={{fontSize:'10px'}}>lock</span>}
-                        DL
-                      </button>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-white/60 font-label uppercase tracking-widest">
-                        {(profile?.model_tier ?? 'svm') === 'dl' ? 'Deep Learning active' : 'Standard ML active'}
-                      </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* ML card */}
+                    <button
+                      onClick={() => setModelTier('svm')}
+                      className={`relative p-5 rounded-2xl border-2 text-left transition-all group ${
+                        (profile?.model_tier ?? 'svm') === 'svm'
+                          ? 'border-white/30 bg-white/10'
+                          : 'border-white/5 bg-white/[0.02] hover:border-white/15 hover:bg-white/5'
+                      }`}
+                    >
+                      {(profile?.model_tier ?? 'svm') === 'svm' && (
+                        <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.8)]" />
+                      )}
+                      <span className="material-symbols-outlined text-2xl text-white/50 mb-3 block">psychology</span>
+                      <p className="font-black text-sm uppercase tracking-widest text-white">ML</p>
+                      <p className="text-[9px] text-white/40 mt-0.5 uppercase tracking-widest">Standard · Free</p>
+                      <p className="text-[10px] text-white/30 mt-3 leading-relaxed">Keyword matching + SVM classifier</p>
+                    </button>
+
+                    {/* DL card */}
+                    <button
+                      onClick={() => isPremium && setModelTier('dl')}
+                      disabled={!isPremium}
+                      className={`relative p-5 rounded-2xl border-2 text-left transition-all ${
+                        (profile?.model_tier ?? 'svm') === 'dl'
+                          ? 'border-gold bg-gold/10 shadow-[0_0_24px_rgba(201,168,76,0.2)]'
+                          : isPremium
+                            ? 'border-gold/20 bg-white/[0.02] hover:border-gold/40 hover:bg-gold/5'
+                            : 'border-white/5 bg-white/[0.02] opacity-50 cursor-not-allowed'
+                      }`}
+                    >
+                      {(profile?.model_tier ?? 'svm') === 'dl' && (
+                        <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-gold shadow-[0_0_8px_rgba(201,168,76,0.9)]" />
+                      )}
                       {!isPremium && (
-                        <Link to="/upgrade" className="text-[10px] text-gold hover:underline font-label uppercase tracking-widest">
-                          Upgrade for DL →
+                        <span className="material-symbols-outlined absolute top-3 right-3 text-sm text-white/20">lock</span>
+                      )}
+                      <span className="material-symbols-outlined text-2xl text-gold/70 mb-3 block">hub</span>
+                      <p className={`font-black text-sm uppercase tracking-widest ${(profile?.model_tier ?? 'svm') === 'dl' ? 'text-gold' : 'text-white/60'}`}>
+                        Deep Learning
+                      </p>
+                      <p className="text-[9px] text-gold/50 mt-0.5 uppercase tracking-widest">Neural · Premium ★</p>
+                      <p className="text-[10px] text-white/30 mt-3 leading-relaxed">Context-aware neural spam detection</p>
+                      {!isPremium && (
+                        <Link to="/upgrade" onClick={(e) => e.stopPropagation()} className="text-[9px] text-gold hover:underline mt-2 block uppercase tracking-widest">
+                          Upgrade →
                         </Link>
                       )}
-                    </div>
+                    </button>
                   </div>
                 </div>
               </div>

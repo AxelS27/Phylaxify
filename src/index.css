@@ -142,6 +142,44 @@
   .snap-page { scroll-snap-type: none; scroll-behavior: auto; }
 }
 
+/* ── Light mode ─────────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  color-scheme: light;
+  --color-background-color: #F3EDE3;
+  --color-on-surface: #1A1410;
+  --color-on-surface-variant: #5C5040;
+  --color-surface: #EAE3D8;
+  --color-surface-dim: #E2DBD0;
+  --color-outline: rgba(0,0,0,0.12);
+  --color-glass: rgba(255,255,255,0.5);
+  --color-error: #B3261E;
+  --color-tertiary: #8B6200;
+}
+
+[data-theme="light"] body {
+  background-color: var(--color-background-color);
+  color: var(--color-on-surface);
+}
+
+[data-theme="light"] .liquid-glass {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+}
+
+[data-theme="light"] .liquid-glass-cine {
+  background: rgba(255,255,255,0.4);
+}
+
+/* ── Reduce-motion (app-controlled) ─────────────────────────────────────── */
+.reduce-motion .blurFadeUp,
+.reduce-motion .animate-blur-fade-up {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
+
 /* Greek meander border strip: repeating key pattern */
 .greek-border-top,
 .greek-border-bottom {
