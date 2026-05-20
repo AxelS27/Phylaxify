@@ -4,6 +4,7 @@ import { Layout } from '../components/Layout';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import { useProfile } from '../lib/profile';
+import { isActivePremium } from '../lib/plan';
 import type { Database } from '../lib/database.types';
 
 type Donation = Database['public']['Tables']['donations']['Row'];
@@ -37,6 +38,7 @@ function timeAgo(ts: string) {
 export function Dashboard() {
   const { user } = useAuth();
   const { profile } = useProfile();
+  const isPremium = isActivePremium(profile?.plan ?? 'free', profile?.plan_expires_at ?? null);
   const [stats, setStats] = useState<Stats>({ totalAmount: 0, blocked: 0, passed: 0 });
   const [recent, setRecent] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,13 +95,26 @@ export function Dashboard() {
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <p className="text-xs text-white/40 font-label uppercase">Guardian</p>
+            <div className="flex items-center justify-end gap-2 mb-0.5">
+              {isPremium && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gold text-[#0A0A0A] text-[9px] font-black uppercase tracking-widest shadow-[0_0_10px_rgba(201,168,76,0.4)]">
+                  <span className="material-symbols-outlined text-[10px]" style={{ fontSize: '10px' }}>star</span>
+                  Premium
+                </span>
+              )}
+              <p className="text-xs text-white/40 font-label uppercase">Guardian</p>
+            </div>
             <p className="text-sm font-bold text-on-surface">@{profile?.username ?? '...'}</p>
           </div>
-          <div className="w-10 h-10 rounded-full border border-gold/50 bg-[#111111] flex items-center justify-center">
+          <div className={`w-10 h-10 rounded-full bg-[#111111] flex items-center justify-center relative ${isPremium ? 'border-2 border-gold shadow-[0_0_12px_rgba(201,168,76,0.5)]' : 'border border-gold/50'}`}>
             <span className="font-display text-gold text-lg uppercase">
               {(profile?.username ?? '?').slice(0, 1)}
             </span>
+            {isPremium && (
+              <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gold flex items-center justify-center shadow-md">
+                <span className="material-symbols-outlined text-[#0A0A0A]" style={{ fontSize: '10px' }}>star</span>
+              </span>
+            )}
           </div>
         </div>
       </header>
