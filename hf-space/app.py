@@ -1,4 +1,4 @@
-"""FastAPI server for the Phylaxify SVM judol filter (HF Space entry point).
+"""FastAPI server for the Phylaxify judol filter (HF Space entry point).
 
 Two-layer pipeline:
   1. blocklist.csv — fast keyword/brand match on aggressive_view. If a known
@@ -21,25 +21,27 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-import joblib
+import torch
+import torch.nn.functional as F
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from preprocess import aggressive_view, normalize_text, preprocess_level3
+from preprocess import aggressive_view, make_input, normalize_text
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("phylaxify-ml")
 
-MODEL_PATH = os.environ.get("MODEL_PATH", "./models/svm_level3.joblib")
+MODEL_PATH = os.environ.get("MODEL_PATH", "./models")
 BLOCKLIST_PATH = os.environ.get("BLOCKLIST_PATH", "./blocklist.csv")
 LABEL_MAP = {0: "CLEAN", 1: "JUDOL"}
 
 state: dict = {
     "model": None,
-    "vectorizer": None,
-    "metadata": {},
+    "tokenizer": None,
     "threshold": 0.5,
+    "max_length": 256,
     "blocklist": [],
 }
 
@@ -110,32 +112,31 @@ def _check_blocklist(aggressive: str, entries: list[BlockEntry]) -> list[dict]:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    model_path = Path(MODEL_PATH)
-    if model_path.is_dir():
-        model_path = model_path / "svm_level3.joblib"
+    log.info(f"Loading model from {MODEL_PATH}...")
+    state["tokenizer"] = AutoTokenizer.from_pretrained(MODEL_PATH)
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
+    model.eval()
+    if torch.cuda.is_available():
+        model.to("cuda")
+        log.info("Model loaded on GPU")
+    else:
+        log.info("Model loaded on CPU")
+    state["model"] = model
 
-    log.info(f"Loading SVM bundle from {model_path}...")
-    bundle = joblib.load(model_path)
-    state["model"] = bundle["model"]
-    state["vectorizer"] = bundle["vectorizer"]
-    state["metadata"] = bundle.get("metadata", {})
-
-    report_path = model_path.with_name("svm_level3_report.json")
-    if report_path.exists():
-        report = json.loads(report_path.read_text(encoding="utf-8"))
-        state["threshold"] = float(report.get("threshold", state["threshold"]))
-
-    log.info(
-        "SVM loaded: threshold=%.4f, weighted_f1=%s",
-        state["threshold"],
-        state["metadata"].get("metrics", {}).get("f1_weighted"),
-    )
+    cfg_path = Path(MODEL_PATH) / "phylaxify_config.json"
+    if cfg_path.exists():
+        cfg = json.loads(cfg_path.read_text())
+        state["threshold"] = float(cfg.get("threshold", 0.5))
+        state["max_length"] = int(cfg.get("max_length", 256))
+        log.info(f"threshold={state['threshold']:.4f}, max_length={state['max_length']}")
+    else:
+        log.warning("phylaxify_config.json not found, using defaults")
 
     state["blocklist"] = _load_blocklist(BLOCKLIST_PATH)
     yield
 
 
-app = FastAPI(title="Phylaxify SVM Judol Filter", lifespan=lifespan)
+app = FastAPI(title="Phylaxify IndoBERT Judol Filter", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -168,9 +169,7 @@ async def health():
         "status": "ok",
         "model_loaded": state["model"] is not None,
         "threshold": state["threshold"],
-        "model_type": state["metadata"].get("model_type", "Calibrated LinearSVC"),
-        "preprocessing_level": state["metadata"].get("preprocessing_level", 3),
-        "metrics": state["metadata"].get("metrics", {}),
+        "max_length": state["max_length"],
         "blocklist_entries": len(state["blocklist"]),
     }
 
@@ -189,8 +188,8 @@ async def list_blocklist():
 
 @app.post("/predict", response_model=PredictResponse)
 async def predict(req: PredictRequest):
-    model, vectorizer = state["model"], state["vectorizer"]
-    if model is None or vectorizer is None:
+    model, tokenizer = state["model"], state["tokenizer"]
+    if model is None or tokenizer is None:
         raise HTTPException(status_code=503, detail="model not loaded")
 
     start = time.time()
@@ -215,21 +214,29 @@ async def predict(req: PredictRequest):
                 processing_ms=round((time.time() - start) * 1000, 2),
             )
 
-        # Layer 2: calibrated LinearSVC semantic classifier.
-        model_input = preprocess_level3(req.text)
-        features = vectorizer.transform([model_input])
-        if hasattr(model, "predict_proba"):
-            p_clean, p_judol = model.predict_proba(features)[0].tolist()
-        else:
-            pred = int(model.predict(features)[0])
-            p_clean, p_judol = (0.0, 1.0) if pred == 1 else (1.0, 0.0)
+        # Layer 2: IndoBERT semantic classifier.
+        model_input = make_input(req.text)
+        enc = tokenizer(
+            model_input,
+            return_tensors="pt",
+            truncation=True,
+            padding=True,
+            max_length=state["max_length"],
+        )
+        device = next(model.parameters()).device
+        enc = {k: v.to(device) for k, v in enc.items()}
 
+        with torch.no_grad():
+            logits = model(**enc).logits
+            probs = F.softmax(logits, dim=-1)[0].cpu().tolist()
+
+        p_clean, p_judol = probs[0], probs[1]
         threshold = state["threshold"]
         is_judol = p_judol >= threshold
         label = "JUDOL" if is_judol else "CLEAN"
         confidence = p_judol if is_judol else p_clean
         all_scores = {"CLEAN": p_clean, "JUDOL": p_judol}
-        matched = ["SVM Level 3"] if is_judol else []
+        matched = [label] if is_judol else []
 
         return PredictResponse(
             label=label,
@@ -240,7 +247,7 @@ async def predict(req: PredictRequest):
             matched_patterns=matched,
             blocklist_hits=[],
             layer="model",
-            normalized=model_input,
+            normalized=norm,
             aggressive=aggr,
             processing_ms=round((time.time() - start) * 1000, 2),
         )
