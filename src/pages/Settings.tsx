@@ -96,119 +96,134 @@ export function Settings() {
         <div className="blurFadeUp" style={{animationDelay: '0.2s'}}>
           {activeTab === 'filter' && (
             <div className="grid grid-cols-12 gap-8">
-              <div className="col-span-12 lg:col-span-7 liquid-glass p-10 rounded-3xl flex flex-col justify-between border border-gold/10 relative overflow-hidden">
+              {/* Global Shield */}
+              <div className="col-span-12 lg:col-span-7 liquid-glass p-10 rounded-3xl flex flex-col gap-8 border border-gold/10 relative overflow-hidden">
                 <div className="absolute -bottom-12 -right-12 w-48 h-48 greek-meander opacity-5"></div>
-                <div>
-                  <div className="flex items-center justify-between mb-8">
-                    <div>
-                      <h3 className="font-h2 text-2xl text-white uppercase tracking-widest">Global Shield</h3>
-                      <p className={`text-[11px] font-black uppercase tracking-[0.2em] mt-1 ${profile?.filter_enabled ? 'text-gold' : 'text-error'}`}>
-                         Protection Status: {profile?.filter_enabled ? 'Active' : 'Offline'}
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer transform scale-[1.2]">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        checked={profile?.filter_enabled ?? false}
-                        onChange={toggleFilter}
-                      />
-                      <div className="w-14 h-7 bg-[#222222] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gold"></div>
-                    </label>
-                  </div>
-                  <div className="space-y-6">
-                    <p className="text-white/50 font-body text-base leading-relaxed">
-                      The core defensive layer. When enabled, every incoming donation is passed through the triple-layer filter: 
-                      Custom Blocklist, Regex Patterns, and BERT Machine Learning.
-                    </p>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                       <div className="p-5 bg-white/5 rounded-2xl border border-white/5">
-                          <h4 className="text-[10px] text-gold font-bold uppercase tracking-widest mb-1">Layer 1 & 2</h4>
-                          <p className="text-xs text-white/60">Keyword & Pattern Matching</p>
-                       </div>
-                       <div className="p-5 bg-gold/5 rounded-2xl border border-gold/20">
-                          <h4 className="text-[10px] text-gold font-bold uppercase tracking-widest mb-1">Layer 3 (ML)</h4>
-                          <p className="text-xs text-white/60">Neural Protection</p>
-                       </div>
-                    </div>
 
-                    {/* ML / DL tier switch */}
-                    <div className="space-y-3 pt-2">
-                      <label className="font-label text-[10px] text-white/40 uppercase tracking-[0.2em]">
-                        Layer 3 — ML Model Tier
-                      </label>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setModelTier('svm')}
-                          disabled={!isPremium}
-                          className={`flex-1 py-3 rounded-xl border text-[10px] uppercase font-bold tracking-widest transition-all ${
-                            (profile?.model_tier ?? 'svm') === 'svm'
-                              ? 'bg-white/10 text-white border-white/20'
-                              : 'border-white/10 text-white/40 hover:bg-white/5'
-                          } disabled:cursor-default`}
-                        >
-                          SVM
-                          <span className="block text-[9px] font-normal normal-case mt-0.5 opacity-60">Standard · Free</span>
-                        </button>
-                        <button
-                          onClick={() => setModelTier('dl')}
-                          disabled={!isPremium}
-                          className={`flex-1 relative py-3 rounded-xl border text-[10px] uppercase font-bold tracking-widest transition-all ${
-                            (profile?.model_tier ?? 'svm') === 'dl'
-                              ? 'bg-gold/10 text-gold border-gold/30'
-                              : isPremium
-                                ? 'border-white/10 text-white/40 hover:bg-white/5'
-                                : 'border-white/5 text-white/20 cursor-not-allowed'
-                          }`}
-                        >
-                          {!isPremium && (
-                            <span className="material-symbols-outlined text-[11px] absolute top-2 right-2 text-white/20">lock</span>
-                          )}
-                          DL
-                          <span className="block text-[9px] font-normal normal-case mt-0.5 opacity-60">Deep Learning · Premium</span>
-                        </button>
-                      </div>
-                      {!isPremium ? (
-                        <p className="text-[10px] text-white/30 uppercase tracking-widest">
-                          <Link to="/upgrade" className="text-gold hover:underline">Upgrade to Premium</Link> to enable the Deep Learning model.
-                        </p>
-                      ) : (
-                        <p className="text-[10px] text-white/30 uppercase tracking-widest">
-                          Active model: <span className="text-gold font-bold">{(profile?.model_tier ?? 'svm').toUpperCase()}</span>
-                        </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-h2 text-2xl text-white uppercase tracking-widest">Global Shield</h3>
+                    <p className={`text-[11px] font-black uppercase tracking-[0.2em] mt-1 ${profile?.filter_enabled ? 'text-gold' : 'text-error'}`}>
+                      Protection Status: {profile?.filter_enabled ? 'Active' : 'Offline'}
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer transform scale-[1.2]">
+                    <input type="checkbox" className="sr-only peer" checked={profile?.filter_enabled ?? false} onChange={toggleFilter} />
+                    <div className="w-14 h-7 bg-[#222222] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gold"></div>
+                  </label>
+                </div>
+
+                <p className="text-white/50 font-body text-sm leading-relaxed -mt-4">
+                  Every incoming donation passes through 3 layers: Custom Blocklist → Regex Patterns → ML Neural Shield.
+                </p>
+
+                {/* ML / DL pill toggle */}
+                <div className="space-y-3">
+                  <label className="font-label text-[10px] text-white/40 uppercase tracking-[0.2em]">Layer 3 — Neural Model</label>
+                  <div className="flex items-center gap-4">
+                    <div className={`flex p-1 rounded-full border ${isPremium ? 'bg-white/5 border-white/10' : 'bg-white/5 border-white/5'}`}>
+                      <button
+                        onClick={() => setModelTier('svm')}
+                        className={`px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                          (profile?.model_tier ?? 'svm') === 'svm'
+                            ? 'bg-white/20 text-white shadow-sm'
+                            : 'text-white/30 hover:text-white/60'
+                        }`}
+                      >
+                        ML
+                      </button>
+                      <button
+                        onClick={() => isPremium && setModelTier('dl')}
+                        className={`relative px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+                          (profile?.model_tier ?? 'svm') === 'dl'
+                            ? 'bg-gold text-[#0A0A0A] shadow-[0_0_10px_rgba(201,168,76,0.4)]'
+                            : isPremium
+                              ? 'text-white/30 hover:text-white/60'
+                              : 'text-white/15 cursor-not-allowed'
+                        }`}
+                      >
+                        {!isPremium && <span className="material-symbols-outlined text-[10px] mr-1" style={{fontSize:'10px'}}>lock</span>}
+                        DL
+                      </button>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-white/60 font-label uppercase tracking-widest">
+                        {(profile?.model_tier ?? 'svm') === 'dl' ? 'Deep Learning active' : 'Standard ML active'}
+                      </p>
+                      {!isPremium && (
+                        <Link to="/upgrade" className="text-[10px] text-gold hover:underline font-label uppercase tracking-widest">
+                          Upgrade for DL →
+                        </Link>
                       )}
                     </div>
                   </div>
                 </div>
               </div>
 
+              {/* Sentinel Tuning */}
               <div className="col-span-12 lg:col-span-5 liquid-glass p-10 rounded-3xl flex flex-col gap-8">
                 <h3 className="font-h2 text-xl text-white flex items-center gap-3">
                   <span className="material-symbols-outlined text-gold">tune</span>
                   Sentinel Tuning
                 </h3>
                 <div className="space-y-8">
-                  <div className="space-y-4">
-                    <label className="font-label text-[10px] text-white/40 uppercase tracking-[0.2em]">Sensitivity Level</label>
-                    <div className="flex gap-2">
-                      <button className="flex-1 py-4 rounded-xl border border-white/10 text-white/40 text-[10px] uppercase font-bold hover:bg-white/5 transition-all">Loose</button>
-                      <button className="flex-1 py-4 rounded-xl bg-gold text-black text-[10px] uppercase font-bold shadow-[0_0_15px_rgba(201,168,76,0.3)]">Normal</button>
-                      <button className="flex-1 py-4 rounded-xl border border-white/10 text-white/40 text-[10px] uppercase font-bold hover:bg-white/5 transition-all">Strict</button>
+                  {/* Sensitivity */}
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between">
+                      <label className="font-label text-[10px] text-white/40 uppercase tracking-[0.2em]">Sensitivity Level</label>
                     </div>
+                    <p className="text-[10px] text-white/30 leading-relaxed">
+                      Controls ML confidence threshold. Strict = blocks more (may false-positive). Loose = allows more through.
+                    </p>
+                    <div className="flex gap-2">
+                      {(['loose', 'normal', 'strict'] as const).map((lvl) => (
+                        <button
+                          key={lvl}
+                          onClick={() => user && updateProfile(user.id, { sensitivity: lvl }).then(() => refresh())}
+                          className={`flex-1 py-3 rounded-xl text-[10px] uppercase font-bold tracking-widest transition-all ${
+                            (profile?.sensitivity ?? 'normal') === lvl
+                              ? 'bg-gold text-[#0A0A0A] shadow-[0_0_15px_rgba(201,168,76,0.3)]'
+                              : 'border border-white/10 text-white/40 hover:bg-white/5'
+                          }`}
+                        >
+                          {lvl}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-white/20 uppercase tracking-widest">
+                      {(profile?.sensitivity ?? 'normal') === 'loose' && 'ML threshold: 0.85 — only very confident spam blocked'}
+                      {(profile?.sensitivity ?? 'normal') === 'normal' && 'ML threshold: 0.70 — balanced (recommended)'}
+                      {(profile?.sensitivity ?? 'normal') === 'strict' && 'ML threshold: 0.50 — aggressive, may catch false positives'}
+                    </p>
                   </div>
 
-                  <div className="space-y-4">
+                  {/* Filter Scope */}
+                  <div className="space-y-3">
                     <label className="font-label text-[10px] text-white/40 uppercase tracking-[0.2em]">Filter Scope</label>
-                    <div className="space-y-3">
-                       <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/5">
-                          <span className="material-symbols-outlined text-gold text-sm">check_circle</span>
-                          <span className="text-xs text-white/80">Filter Donation Message</span>
-                       </div>
-                       <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/5">
-                          <span className="material-symbols-outlined text-gold text-sm">check_circle</span>
-                          <span className="text-xs text-white/80">Filter Donator Name</span>
-                       </div>
+                    <p className="text-[10px] text-white/30 leading-relaxed">Choose what gets scanned on each donation.</p>
+                    <div className="space-y-2">
+                      {([
+                        { key: 'filter_message', label: 'Filter Donation Message' },
+                        { key: 'filter_name', label: 'Filter Donator Name' },
+                      ] as const).map(({ key, label }) => {
+                        const active = profile?.[key] ?? true;
+                        return (
+                          <button
+                            key={key}
+                            onClick={() => user && updateProfile(user.id, { [key]: !active }).then(() => refresh())}
+                            className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all ${
+                              active
+                                ? 'bg-white/5 border-white/10'
+                                : 'bg-white/[0.02] border-white/5 opacity-50'
+                            }`}
+                          >
+                            <span className={`material-symbols-outlined text-sm ${active ? 'text-gold' : 'text-white/20'}`}>
+                              {active ? 'check_circle' : 'radio_button_unchecked'}
+                            </span>
+                            <span className="text-xs text-white/80 font-label">{label}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>

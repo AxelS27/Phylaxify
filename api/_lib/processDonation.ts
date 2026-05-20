@@ -8,6 +8,9 @@ type ProfileLite = {
   plan: string;
   plan_expires_at: string | null;
   model_tier: string | null;
+  sensitivity: string | null;
+  filter_message: boolean | null;
+  filter_name: boolean | null;
 };
 
 /**
@@ -16,7 +19,7 @@ type ProfileLite = {
 export async function findProfileByWebhookToken(token: string): Promise<ProfileLite | null> {
   const { data, error } = await supabaseAdmin
     .from('profiles')
-    .select('id, filter_enabled, plan, plan_expires_at, model_tier')
+    .select('id, filter_enabled, plan, plan_expires_at, model_tier, sensitivity, filter_message, filter_name')
     .eq('webhook_token', token)
     .maybeSingle();
   if (error || !data) return null;
@@ -44,8 +47,14 @@ export async function processDonation(profile: ProfileLite, d: Donation) {
     // Free users are locked to SVM. Premium users use their stored preference (default dl).
     const requestedTier = (profile.model_tier ?? 'svm') as 'svm' | 'dl';
     const modelTier = isPremium ? requestedTier : 'svm';
+    const sensitivity = (profile.sensitivity ?? 'normal') as 'loose' | 'normal' | 'strict';
+    const doFilterName = profile.filter_name ?? true;
+    const doFilterMsg = profile.filter_message ?? true;
 
-    filterResult = await filterDonation(d.donator, d.message, customBlocklist, [], true, modelTier);
+    filterResult = await filterDonation(
+      d.donator, d.message, customBlocklist, [], true,
+      modelTier, sensitivity, doFilterName, doFilterMsg,
+    );
   }
 
   const insertPayload = {

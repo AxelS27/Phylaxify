@@ -61,7 +61,7 @@ export function useProfile() {
 
 export async function updateProfile(
   userId: string,
-  patch: Partial<Pick<Profile, 'username' | 'filter_enabled' | 'model_tier'>>,
+  patch: Partial<Pick<Profile, 'username' | 'filter_enabled' | 'model_tier' | 'sensitivity' | 'filter_message' | 'filter_name'>>,
 ) {
   const { error } = await supabase.from('profiles').update(patch).eq('id', userId);
   return { error: error?.message ?? null };

@@ -95,15 +95,9 @@ export function Dashboard() {
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <div className="flex items-center justify-end gap-2 mb-0.5">
-              {isPremium && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gold text-[#0A0A0A] text-[9px] font-black uppercase tracking-widest shadow-[0_0_10px_rgba(201,168,76,0.4)]">
-                  <span className="material-symbols-outlined text-[10px]" style={{ fontSize: '10px' }}>star</span>
-                  Premium
-                </span>
-              )}
-              <p className="text-xs text-white/40 font-label uppercase">Guardian</p>
-            </div>
+            <p className={`text-xs font-label uppercase tracking-widest ${isPremium ? 'text-gold font-bold' : 'text-white/40'}`}>
+              {isPremium ? '★ Premium' : 'Guardian'}
+            </p>
             <p className="text-sm font-bold text-on-surface">@{profile?.username ?? '...'}</p>
           </div>
           <div className={`w-10 h-10 rounded-full bg-[#111111] flex items-center justify-center relative ${isPremium ? 'border-2 border-gold shadow-[0_0_12px_rgba(201,168,76,0.5)]' : 'border border-gold/50'}`}>

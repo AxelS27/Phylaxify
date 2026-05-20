@@ -177,9 +177,17 @@ function checkPatterns(v: Variants):
 
 // ────────────── Layer 3: ML ──────────────
 
-async function checkML(message: string, tier: 'svm' | 'dl' = 'svm'): Promise<FilterResult | null> {
-  // SVM uses JUDOL_SVM_API_URL, falling back to legacy JUDOL_ML_API_URL.
-  // DL uses JUDOL_DL_API_URL (premium only).
+const SENSITIVITY_THRESHOLDS: Record<string, number> = {
+  loose: 0.85,
+  normal: 0.7,
+  strict: 0.5,
+};
+
+async function checkML(
+  message: string,
+  tier: 'svm' | 'dl' = 'svm',
+  sensitivity: 'loose' | 'normal' | 'strict' = 'normal',
+): Promise<FilterResult | null> {
   const apiUrl =
     tier === 'dl'
       ? process.env.JUDOL_DL_API_URL
@@ -187,7 +195,7 @@ async function checkML(message: string, tier: 'svm' | 'dl' = 'svm'): Promise<Fil
   if (!apiUrl) return null;
 
   const timeoutMs = parseInt(process.env.JUDOL_ML_TIMEOUT_MS ?? '2000', 10);
-  const threshold = parseFloat(process.env.JUDOL_ML_CONFIDENCE_THRESHOLD ?? '0.7');
+  const threshold = SENSITIVITY_THRESHOLDS[sensitivity] ?? parseFloat(process.env.JUDOL_ML_CONFIDENCE_THRESHOLD ?? '0.7');
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -244,6 +252,7 @@ export async function filterMessage(
   customWhitelist: string[] = [],
   enableML = true,
   modelTier: 'svm' | 'dl' = 'svm',
+  sensitivity: 'loose' | 'normal' | 'strict' = 'normal',
 ): Promise<FilterResult> {
   if (!message || message.trim() === '') {
     return { blocked: false, reason: 'empty message', confidence: 1, layer: 'none' };
@@ -302,7 +311,7 @@ export async function filterMessage(
   }
 
   if (enableML) {
-    const ml = await checkML(message, modelTier);
+    const ml = await checkML(message, modelTier, sensitivity);
     if (ml && ml.blocked) return ml;
   }
 
@@ -319,10 +328,16 @@ export async function filterDonation(
   customWhitelist: string[] = [],
   enableML = true,
   modelTier: 'svm' | 'dl' = 'svm',
+  sensitivity: 'loose' | 'normal' | 'strict' = 'normal',
+  filterName = true,
+  filterMessage_ = true,
 ): Promise<FilterResult> {
-  const nameResult = await filterMessage(name, customBlocklist, customWhitelist, enableML, modelTier);
-  if (nameResult.blocked) {
-    return { ...nameResult, reason: `Name: ${nameResult.reason}` };
+  if (filterName) {
+    const nameResult = await filterMessage(name, customBlocklist, customWhitelist, enableML, modelTier, sensitivity);
+    if (nameResult.blocked) return { ...nameResult, reason: `Name: ${nameResult.reason}` };
   }
-  return filterMessage(message, customBlocklist, customWhitelist, enableML, modelTier);
+  if (filterMessage_) {
+    return filterMessage(message, customBlocklist, customWhitelist, enableML, modelTier, sensitivity);
+  }
+  return { blocked: false, reason: 'clean', confidence: 0.9, layer: 'none' };
 }

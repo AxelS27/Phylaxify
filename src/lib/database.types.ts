@@ -11,6 +11,9 @@ export type Database = {
           plan: 'free' | 'premium';
           plan_expires_at: string | null;
           model_tier: 'svm' | 'dl';
+          sensitivity: 'loose' | 'normal' | 'strict';
+          filter_message: boolean;
+          filter_name: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -23,6 +26,9 @@ export type Database = {
           plan?: 'free' | 'premium';
           plan_expires_at?: string | null;
           model_tier?: 'svm' | 'dl';
+          sensitivity?: 'loose' | 'normal' | 'strict';
+          filter_message?: boolean;
+          filter_name?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -35,6 +41,9 @@ export type Database = {
           plan?: 'free' | 'premium';
           plan_expires_at?: string | null;
           model_tier?: 'svm' | 'dl';
+          sensitivity?: 'loose' | 'normal' | 'strict';
+          filter_message?: boolean;
+          filter_name?: boolean;
           created_at?: string;
           updated_at?: string;
         };
