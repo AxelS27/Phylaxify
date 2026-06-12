@@ -95,14 +95,18 @@ export function Overlay() {
       } catch (e) {
 
       }
+    }
+  }, [currentDonation, queue]);
 
+  useEffect(() => {
+    if (currentDonation) {
       const timer = setTimeout(() => {
         setCurrentDonation(null);
       }, 3000);
 
       return () => clearTimeout(timer);
     }
-  }, [currentDonation, queue]);
+  }, [currentDonation]);
 
   if (loading) return null;
   
