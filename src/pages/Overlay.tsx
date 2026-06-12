@@ -98,7 +98,7 @@ export function Overlay() {
 
       const timer = setTimeout(() => {
         setCurrentDonation(null);
-      }, 10000);
+      }, 3000);
 
       return () => clearTimeout(timer);
     }
