@@ -2,6 +2,10 @@
 
 A high-performance AI-powered filtering system designed to protect content creators and streamers from donation spam, illegal gambling promotions, predatory loans, and malicious bots. Built with a **Triple-Layer Shield** architecture and a real-time **OBS Overlay Integration**.
 
+## 🎥 Demo
+
+Click the image below to watch the demo video:
+
 <p align="center">
   <a href="https://drive.google.com/file/d/190MZR-jwwPE4057kRnFTITIT2SHzoXuk/view">
     <img src="public/assets/pictures/screenshot.png" alt="Phylaxify Demo Video" width="800" style="border-radius: 8px;" />
