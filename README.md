@@ -8,6 +8,24 @@ A high-performance AI-powered filtering system designed to protect content creat
   </a>
 </p>
 
+## 📸 Preview
+
+<p align="center">
+  <img src="public/assets/pictures/preview1.png" width="32%" />
+  <img src="public/assets/pictures/preview2.png" width="32%" />
+  <img src="public/assets/pictures/preview3.png" width="32%" />
+  <br/>
+  <img src="public/assets/pictures/preview4.png" width="32%" />
+  <img src="public/assets/pictures/preview5.png" width="32%" />
+  <img src="public/assets/pictures/preview6.png" width="32%" />
+  <br/>
+  <img src="public/assets/pictures/preview7.png" width="32%" />
+  <img src="public/assets/pictures/preview8.png" width="32%" />
+  <img src="public/assets/pictures/preview9.png" width="32%" />
+  <br/>
+  <img src="public/assets/pictures/preview10.png" width="32%" />
+</p>
+
 ---
 
 ## 🏛️ System Architecture
