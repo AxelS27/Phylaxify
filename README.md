@@ -98,31 +98,6 @@ graph TD
     H --> J[Guardian Dashboard]
 ```
 
-## 🏁 Quick Start
-
-### **1. Guardian Dashboard (Web UI)**
-
-```bash
-# Clone the repository
-git clone https://github.com/AxelS27/Phylaxify.git
-cd Phylaxify
-
-# Install dependencies
-npm install
-
-# Launch development server
-npm run dev
-```
-
-### **2. Environment Configuration**
-
-Create a `.env` file in the root directory with your Supabase credentials:
-
-```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_anon_key
-```
-
 ## 🚀 Key Features
 
 * **Triple-Layer Defense**: Combines deterministic Regex/Keyword matching with probabilistic Neural Analysis (BERT) and linguistic heuristics.
